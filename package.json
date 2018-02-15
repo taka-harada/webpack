@@ -1,5 +1,5 @@
 {
-  "name": "BaseStation skeleton for webpack",
+  "name": "BaseStation-webpack",
   "description": "Apply webpack in BaseStation",
   "author": "TakaHarada",
   "scripts": {
