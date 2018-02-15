@@ -1,0 +1,57 @@
+version: '2'
+services:
+  proxy:
+    image: registry.hivelocity.co.jp:5000/base-station/proxy
+    ports:
+      - 80:80
+      - 443:443
+    links:
+      - wp
+    environment:
+      SERVER_NAME: dev.hivelocity.co.jp
+      WORDPRESS_HOST: wp
+      SSL: "true"
+
+  wp:
+    build:
+      context: ./wordpress
+      dockerfile: Dockerfile.wp
+    volumes:
+      - $PWD/wordpress/src:/var/www/wordpress/public
+    links:
+      - php
+      - db
+    environment:
+      SERVER_NAME: dev.hivelocity.co.jp
+      PHP_HOST: php
+      BASIC_AUTH: "hivelocity:MJB2cQ7X0ikSU"
+
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile.php
+    links:
+      - db
+    volumes:
+      - $PWD/wordpress/src:/var/www/wordpress/public
+    working_dir: /var/www/wordpress/public
+    environment:
+      HVC_CORP_HOST: db
+      HVC_CORP_NAME: hivelocity
+      HVC_CORP_USERNAME: hivelocity
+      HVC_CORP_PASSWORD: hivelocity
+      HVC_CORP_DEBUG: "false"
+
+  db:
+    image: mysql:5.6
+    environment:
+      MYSQL_ROOT_PASSWORD: hivelocity
+      MYSQL_USER: hivelocity
+      MYSQL_PASSWORD: hivelocity
+      MYSQL_DATABASE: hivelocity
+    ports:
+      - 3306:3306
+    volumes:
+      - $PWD/data:/var/lib/mysql
+      - $PWD/databases:/databases
+      - $PWD/scripts:/scripts

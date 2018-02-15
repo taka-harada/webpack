@@ -1,0 +1,6 @@
+#!/bin/bash
+
+IMAGE_TAG=$(cat .build_version)
+
+docker rmi registry.hivelocity.co.jp:5000/hivelocity-corp/wordpress:${IMAGE_TAG}
+docker rmi registry.hivelocity.co.jp:5000/hivelocity-corp/php:${IMAGE_TAG}

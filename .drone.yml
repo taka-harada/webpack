@@ -1,0 +1,56 @@
+pipeline:
+  restore_cache:
+    image: drillster/drone-volume-cache
+    restore: true
+    mount:
+      - ./wordpress/src/vendor
+      - ./node_modules
+    volumes:
+      - /tmp/cache:/cache
+
+  build:
+    image: node:8-alpine
+    commands:
+      - yarn install
+      - yarn run build
+
+  deploy:
+    image: python:2-alpine
+    commands:
+      - apk add --update openssh bash
+      - bash ./scripts/drone_deploy
+    secrets: [ aws_access_key_id, aws_secret_access_key, private_key_stage, private_key_production ]
+    when:
+      event: tag
+
+  notify:
+    image: plugins/slack
+    webhook: https://hooks.slack.com/services/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
+    channel: frontend
+    username: Drone
+    when:
+      status: [ success, failure ]
+      event: tag
+    template: >
+      {{#success build.status}}
+      :sunny: *{{repo.owner}}/{{repo.name}}*
+
+      *Deploy {{build.tag}} succeeded.*
+      {{else}}
+      :umbrella_with_rain_drops: *{{repo.owner}}/{{repo.name}}*
+
+      *Deploy {{build.tag}} failed.*
+      {{/success}}
+
+      *Author:* {{build.author}}
+
+      {{build.link}}
+
+  rebuild_cache:
+    image: drillster/drone-volume-cache
+    rebuild: true
+    mount:
+      - ./wordpress/src/vendor
+      - ./node_modules
+    volumes:
+      - /tmp/cache:/cache

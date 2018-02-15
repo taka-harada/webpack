@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# It is the initial provisioning script for local development.
+
+docker-compose exec php composer install
+echo "===> Compeleted: Composer"
+
+docker-compose exec db /bin/sh /scripts/setupdb
+echo "===> Compeleted: Database"

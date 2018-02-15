@@ -1,0 +1,22 @@
+#!/bin/bash
+
+IMAGE_TAG=$(cat .build_version)
+
+function docker_pull_base_image(){
+  docker pull registry.hivelocity.co.jp:5000/base-station/wordpress
+  docker pull registry.hivelocity.co.jp:5000/cardinal/php:php7-1.4.0
+}
+
+function docker_build() {
+  docker build -t registry.hivelocity.co.jp:5000/hivelocity-corp/wordpress:${IMAGE_TAG} -f ./wordpress/Dockerfile ./wordpress
+  docker build -t registry.hivelocity.co.jp:5000/hivelocity-corp/php:${IMAGE_TAG} -f ./Dockerfile .
+}
+
+function docker_push() {
+  docker push registry.hivelocity.co.jp:5000/hivelocity-corp/wordpress:${IMAGE_TAG}
+  docker push registry.hivelocity.co.jp:5000/hivelocity-corp/php:${IMAGE_TAG}
+}
+
+docker_pull_base_image
+docker_build
+docker_push

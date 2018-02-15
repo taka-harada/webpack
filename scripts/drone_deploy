@@ -1,0 +1,55 @@
+#!/bin/bash
+
+pip install awscli
+aws --version
+echo "===> Installed aws cli"
+
+mkdir -p -m 700 /root/.ssh
+cat << EOS > ~/.ssh/config
+Host *
+    StrictHostKeyChecking no
+EOS
+echo "===> Set up ssh config"
+
+ssh_stage () {
+echo "$PRIVATE_KEY_STAGE" > /root/.ssh/bst_stage.pem
+chmod 600 /root/.ssh/bst_stage.pem
+ssh -t -t -i ~/.ssh/bst_stage.pem root@103.37.115.212 << EOF
+sh /var/www/vhosts/stage.hivelocity.co.jp/scripts/deploy staging.conf $DRONE_TAG
+exit
+EOF
+}
+
+ssh_production () {
+echo "$PRIVATE_KEY_PRODUCTION" > /root/.ssh/bst_production.pem
+chmod 600 /root/.ssh/bst_production.pem
+ssh -t -t -i ~/.ssh/bst_production.pem root@103.37.115.211 << EOF
+sh /var/www/vhosts/www.hivelocity.co.jp/scripts/deploy production.conf $DRONE_TAG
+exit
+EOF
+}
+
+s3_upload () {
+AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} aws s3 cp \
+  ${PWD}/wordpress/src/content/themes/child-theme/assets \
+  s3://cdn-bst/${FOLDER_NAME}/assets \
+  --recursive \
+  --cache-control max-age=864000
+
+echo "===> Compeleted: Upload an assets file to s3."
+}
+
+
+if [[ ${DRONE_TAG} =~ ^([0-9]{1,}\.[0-9]{1,}\.[0-9]{1,})-(release)\+(stg)$ ]]; then
+  FOLDER_NAME="stage-hivelocity"
+  s3_upload
+  ssh_stage
+  echo "===> ALL Compeleted"
+elif [[ ${DRONE_TAG} =~ ^([0-9]{1,}\.[0-9]{1,}\.[0-9]{1,})-(release)\+(prod)$ ]]; then
+  FOLDER_NAME="prod-hivelocity"
+  s3_upload
+  ssh_production
+  echo "===> ALL Compeleted"
+else
+  echo "SKIP Build & Push"
+fi

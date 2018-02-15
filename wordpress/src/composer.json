@@ -1,0 +1,146 @@
+{
+    "config": {
+      "secure-http": false
+    },
+    "name" : "bst-docker",
+    "description" : "Prototype on Docker Enviroment",
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "wordpress", "version": "4.7.5",
+                "type": "webroot",
+                "dist": {
+                    "type": "zip",
+                    "url": "http://ja.wordpress.org/wordpress-4.7.5-ja.zip"
+                }
+            }
+        },
+        {
+            "type": "composer",
+            "url": "http://wpackagist.org"
+        },
+        {
+            "type": "composer",
+            "url": "https://wp-languages.github.io"
+        },
+        {
+            "type": "git",
+            "url":  "git@gitlab.hivelocity.co.jp:bst_v3/bst-theme.git",
+            "reference":"feature/webpack"
+        },
+        {
+            "type": "git",
+            "url":  "git@gitlab.hivelocity.co.jp:bst_v3/bst-infinite-scroll.git",
+            "reference":"develop"
+        },
+        {
+            "type": "git",
+            "url":  "git@gitlab.hivelocity.co.jp:bst_v3/bst-share-btn.git",
+            "reference":"develop"
+        },
+        {
+            "type": "git",
+            "url":  "git@gitlab.hivelocity.co.jp:bst_v3/bst-series.git",
+            "reference":"master"
+        },
+        {
+            "type": "git",
+            "url":  "git@gitlab.hivelocity.co.jp:bst_v3/bst-sns-analysis.git",
+            "reference":"master"
+        },
+        {
+            "type": "git",
+            "url":  "git@gitlab.hivelocity.co.jp:bst_v3/bst-ranking-widget.git",
+            "reference":"master"
+        },
+        {
+            "type": "git",
+            "url":  "git@gitlab.hivelocity.co.jp:bst_v3/bst-conversion-button.git",
+            "reference":"master"
+        },
+        {
+            "type": "git",
+            "url":  "git@gitlab.hivelocity.co.jp:bst_v3/bst-random-banner.git",
+            "reference":"master"
+        },
+        {
+            "type": "git",
+            "url":  "git@gitlab.hivelocity.co.jp:bst_v3/acf-wp-wysiwyg.git",
+            "reference":"master"
+        },
+        {
+            "type": "git",
+            "url":  "git@gitlab.hivelocity.co.jp:bst_v3/acf-options-page.git",
+            "reference":"master"
+        },
+        {
+            "type": "git",
+            "url":  "git@gitlab.hivelocity.co.jp:bst_v3/acf-repeater-field.git",
+            "reference":"master"
+        },
+        {
+            "type": "git",
+            "url":  "git@gitlab.hivelocity.co.jp:bst_v3/acf-flexible-content-field.git",
+            "reference":"master"
+        },
+        {
+            "type": "git",
+            "url":  "git@gitlab.hivelocity.co.jp:bst_v3/acf-date-time-picker.git",
+            "reference":"master"
+        },
+        {
+            "type": "git",
+            "url":  "git@gitlab.hivelocity.co.jp:bst_v3/trust-form.git",
+            "reference":"master"
+        }
+
+    ],
+    "require": {
+        "wordpress": "4.7.5",
+        "fancyguy/webroot-installer": "1.0.0",
+        "koodimonni/composer-dropin-installer": "*",
+        "koodimonni-language/ja": "*",
+        "deliciousbrains/wp-amazon-web-services": "1.0",
+        "deliciousbrains/wp-amazon-s3-and-cloudfront": "1.1.1",
+        "wpackagist-plugin/advanced-custom-fields": "4.4.11",
+        "wpackagist-plugin/custom-post-type-permalinks": "2.1.2",
+        "wpackagist-plugin/disable-xml-rpc-pingback": "1.1",
+        "wpackagist-plugin/duplicate-post": "2.6",
+        "wpackagist-plugin/favicon-by-realfavicongenerator": "1.3.11",
+        "wpackagist-plugin/intuitive-custom-post-order": "3.0.7",
+        "wpackagist-plugin/slideshare": "1.9.2",
+        "wpackagist-plugin/tinymce-advanced": "4.4.1",
+        "wpackagist-plugin/wp-crontrol": "1.3.1",
+        "wpackagist-plugin/wp-multibyte-patch": "2.8",
+        "wpackagist-plugin/wp-postviews": "1.73",
+        "wpackagist-plugin/yet-another-related-posts-plugin": "4.4",
+        "wpackagist-plugin/wordpress-seo": "3.7.1",
+        "wpackagist-plugin/redirection": "2.5",
+        "wpackagist-plugin/wp-mautic": "2.2.1",
+        "bst/bst-core-theme" : "dev-feature/webpack",
+        "bst/bst-infinite-scroll" : "dev-develop",
+        "bst/hvc-share-btn" : "dev-develop",
+        "bst/bst-series" : "dev-master",
+        "bst/bst-sns-analysis" : "dev-master",
+        "bst/bst-ranking-widget" : "dev-master",
+        "bst/bst-conversion-button" : "dev-master",
+        "acf/acf-wordpress-wysiwyg-field" : "dev-master",
+        "acf/acf-options-page" : "dev-master",
+        "acf/acf-repeater" : "dev-master",
+        "acf/acf-flexible-content": "dev-master",
+        "acf/acf-date-time-picker": "dev-master",
+        "trust/trust-form": "dev-master"
+    },
+    "extra": {
+        "webroot-dir": "wp",
+        "webroot-package": "wordpress",
+        "installer-paths": {
+            "content/plugins/{$name}/": ["type:wordpress-plugin"],
+            "content/themes/{$name}/": ["type:wordpress-theme"]
+        },
+        "dropin-paths": {
+            "content/languages/": ["type:wordpress-language"]
+        }
+    }
+}

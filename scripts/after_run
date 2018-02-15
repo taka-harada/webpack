@@ -1,0 +1,9 @@
+#!/bin/bash
+#
+# G-Direct デプロイ後 実行スクリプト
+# デプロイ実行時に最後にこのスクリプトが実行されます
+#
+# @author yharikita
+# @copyright 2015 (c), Hivelocity inc.
+chown -R wpadmin.wpadmin ${PROJECT_DIR}
+return 0

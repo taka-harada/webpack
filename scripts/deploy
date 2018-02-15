@@ -1,0 +1,92 @@
+#!/bin/bash
+#
+#--------------------------------------------------------------------------------
+# Jenkins連携用 汎用デプロイスクリプト
+# SCM pollingを行い, ビルド時にこのスクリプトを実行することを想定しています
+#
+# 各環境変数は環境別設定ファイルで管理するものとし, 
+# その環境別設定ファイルは同ディレクトリ階層で管理されているものとします
+# ビルド実行時に, ファイル名を引数で渡してください
+#
+# $1 : 設定ファイル名
+#
+# @author yharikita
+# @copyright 2015 (c), Hivelocity inc.
+#--------------------------------------------------------------------------------
+
+readonly SUCCESS=0
+readonly ERR=1
+readonly WARN=2
+readonly NOTICE=3
+
+if [ "${1:-UNDEF}" = "UNDEF" ]; then
+  echo "Missing argument a configuration file name for this script."
+  exit ${ERR}
+fi
+
+echo "Start making deploy script..."
+
+readonly DIR=$(cd $(dirname $0); pwd)
+readonly CONF="${DIR}/${1}"
+if [ ! -e "${CONF}" ]; then
+  echo "Cannnot find a env configuration file."
+  exit ${ERR}
+fi
+source ${CONF}
+
+if [ "${DEPLOY_USER:-UNDEF}" != "UNDEF" ]; then
+  if [ "`whoami`" != "${DEPLOY_USER}" ]; then
+    echo "You couldn't run this script, please chnage to '${DEPLOY_USER}'"
+    exit ${ERR}
+  fi
+fi
+
+STATUS=${SUCESS}
+cd ${PROJECT_DIR}
+
+echo "Fetching remote branches..."
+git fetch origin > /dev/null 2>&1
+
+git reset --hard ${2} 2>/dev/null
+
+if [ -e "${PROJECT_DIR}/.gitmodules" ]; then
+  git submodule update --init
+fi
+
+if [ ${#RENAMES[*]} -gt 0 ]; then
+  for (( i=0; i<${#RENAMES[*]}; ++i ))
+  do
+    pre="`echo ${RENAMES[$i]} | cut -d ' ' -f 1`"
+    if [ -e "${pre}" ]; then
+      mv ${RENAMES[$i]}
+      if [ "$?" = "0" ]; then
+        echo " * Renamed ${RENAMES[$i]} * "
+      fi
+    else
+      echo "Previous file does not exist."
+    fi
+  done
+fi
+
+if [ ${COMPOSER_DIR:-UNDEF} != "UNDEF" ]; then
+  cd ${COMPOSER_DIR}
+  composer install
+  if [ "$?" != "0" ]; then
+    echo "Installing composer libraries were failed..."
+    exit ${ERR}
+  fi
+
+  echo "Installing composer libraries were success."
+fi
+
+if [ "${AFTER_RUN:-UNDEF}" != "UNDEF" ] && [ -e "${AFTER_RUN}" ]; then
+  . ${AFTER_RUN}
+  if [ "$?" != "0" ]; then
+    echo "After run script was failed..."
+    STATUS=${WARN}
+  fi
+
+  echo "After run script was success."
+fi
+
+exit ${STATUS}
